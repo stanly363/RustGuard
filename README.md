@@ -128,11 +128,10 @@ Flow-based analysis is powerful, but some attacks are designed to look like a se
 
 3.  Build the project in release mode for the best performance:
 
-    '''bash
+
 
     cargo build --release
 
-    '''
 
 
 
