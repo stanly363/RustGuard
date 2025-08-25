@@ -34,10 +34,10 @@ The first stage is an unsupervised K-Means clustering model written entirely in 
 ---
 ### ### Stage 2: Python Diagnoser (The Expert Analyst)
 
-The flows flagged as anomalous by Stage 1 are passed to the expert AI in Python (`ml_analysis.py`). This stage uses two supervised Random Forest models.
+The flows flagged as anomalous by Stage 1 are passed to the expert AI in Python (`ml_analysis.py`). This stage uses pre-trained, supervised Random Forest models.
 
-1.  **The Gatekeeper Model:** This is a binary classifier trained to be an expert at one thing: distinguishing between "Benign" and "Attack". It provides the first real verdict on the anomalous flow.
-2.  **The Specialist Model:** If the Gatekeeper identifies a flow as an "Attack", it is then passed to this multi-class classifier. The Specialist is trained on labeled examples of specific attacks (e.g., Port Scan, DDoS, Brute Force) and provides the final, detailed diagnosis.
+1.  **The Gatekeeper Model:** This is a binary classifier trained to distinguish between "Benign" and "Attack". It provides the first real verdict on the anomalous flow.
+2.  **The Specialist Model:** If the Gatekeeper identifies a flow as an "Attack", it is then passed to this multi-class classifier. The Specialist is trained on labeled examples of specific attacks and provides the final, detailed diagnosis.
 
 - **Purpose:** This stage provides accuracy and detail. By using models trained on specific, labeled attack patterns, it can correctly identify the type of threat or dismiss an anomaly flagged by Stage 1 as ultimately benign, significantly reducing false positives.
 
@@ -55,12 +55,12 @@ Flow-based analysis is powerful, but some attacks are designed to look like a se
 ### Prerequisites
 
 - **Rust:** Install via [rustup](https://rustup.rs/).
-- **Python:** Version 3.8 or higher.
+- **Python:** Version 3.8 or higher, with the `numpy` and `scikit-learn` libraries installed (`pip install numpy scikit-learn joblib`).
 - **`pcap` library:** You may need to install development libraries for `libpcap` (Linux: `sudo apt-get install libpcap-dev`) or Npcap (Windows).
 
 ### Building the Project
 
-1.  Clone the repository.
+1.  Clone the repository. Make sure you have the pre-trained `.joblib` files and `model.json` in the main directory.
 2.  Navigate to the project directory.
 3.  Build the project in release mode for the best performance:
     ```bash
@@ -69,45 +69,26 @@ Flow-based analysis is powerful, but some attacks are designed to look like a se
 
 ## How to Use RustGuard
 
-Using the system is a three-step process: training the Rust Anomaly Detector, training the Python AI models, and finally running in detection mode.
+Using the system is a simple two-step process.
 
 ---
 ### ### Step 1: Training the Anomaly Detector (Critical First Step)
 
-This step creates the `model.json` file, which teaches the system what your network's normal traffic looks like.
+This step personalizes the fast filter (Stage 1) to your network's unique traffic patterns. It creates the `model.json` file.
 
 1.  Run the application from your terminal: `cargo run --release`
 2.  When prompted, choose to run in **training mode (y)**.
 3.  Let the application run for the duration (e.g., 5 minutes) on your network during a period of normal activity. **Avoid running any attacks during this phase.**
 
 ---
-### ### Step 2: Training the Python AI Models (The Core Brain)
+### ### Step 2: Running in Detection Mode
 
-This step creates the `.joblib` files that the Python expert analyst uses.
+With the personalized `model.json` created, you are ready to monitor your network using the pre-trained expert models.
 
-1.  **Collect Data:** Gather PCAP files of both benign and malicious traffic. Place them in `pcap_samples/benign` and `pcap_samples/malicious` respectively. For best results, use your own data (see the next section).
-2.  **Extract Features:** Run the Python script to process the PCAPs into a feature set.
-    ```bash
-    python extract_features.py
-    ```
-    This creates `pcap_features.csv`.
-3.  **(Optional) Balance Data:** Run the balancing scripts (`filter_attacks.py`, `balance_attacks.py`) to create a well-distributed malicious dataset.
-4.  **Create Final Dataset:** Run `create_final_dataset.py` to combine your benign flows with your balanced malicious flows into `final_training_dataset.csv`.
-5.  **Train Models:** Run the training script.
-    ```bash
-    python train_models.py
-    ```
-    This reads `final_training_dataset.csv` and generates all the required `.joblib` files (`gatekeeper_model.joblib`, `specialist_model.joblib`, etc.).
-
----
-### ### Step 3: Running in Detection Mode
-
-With `model.json` and all the `.joblib` files in place, you are ready to monitor your network.
-
-1.  Run the application: `cargo run --release`
+1.  Run the application again: `cargo run --release`
 2.  Choose your network interface.
 3.  When prompted, choose to run in **detection mode (n)**.
-4.  Open `http://127.0.0.1:3000` in your browser to view the dashboard.
+4.  Open `http://127.0.0.1:3000` in your browser to view the dashboard and real-time alerts.
 
 ## Creating a High-Accuracy Model for Your Own Network
 
