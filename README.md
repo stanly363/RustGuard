@@ -175,11 +175,9 @@ This step creates the `.joblib` files that the Python expert analyst uses.
 
 2.  **Extract Features:** Run the Python script to process the PCAPs into a feature set.
 
-    ```bash
 
     python extract_features.py
 
-    ```
 
     This creates `pcap_features.csv`.
 
@@ -189,11 +187,9 @@ This step creates the `.joblib` files that the Python expert analyst uses.
 
 5.  **Train Models:** Run the training script.
 
-    ```bash
 
     python train_models.py
 
-    ```
 
     This reads `final_training_dataset.csv` and generates all the required `.joblib` files (`gatekeeper_model.joblib`, `specialist_model.joblib`, etc.).
 
