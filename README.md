@@ -56,8 +56,6 @@ Flow-based analysis is powerful, but some attacks are designed to look like a se
 
 - **Rust:** Install via [rustup](https://rustup.rs/).
 - **Python:** Version 3.8 or higher.
-- **Java JDK:** Version 11 or higher (required to build a dependency for feature extraction).
-- **Apache Maven:** Required to build the Java dependency.
 - **`pcap` library:** You may need to install development libraries for `libpcap` (Linux: `sudo apt-get install libpcap-dev`) or Npcap (Windows).
 
 ### Building the Project
